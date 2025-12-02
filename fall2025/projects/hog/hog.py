@@ -22,6 +22,15 @@ def roll_dice(num_rolls, dice=six_sided):
     assert num_rolls > 0, "Must roll at least once."
     # BEGIN PROBLEM 1
     "*** YOUR CODE HERE ***"
+    sow_sad, res = False, 0
+    for i in range(num_rolls):
+        t = dice()
+        if t == 1:
+            sow_sad = True
+        res += t
+    if sow_sad:
+        return 1
+    return res
     # END PROBLEM 1
 
 
@@ -34,6 +43,7 @@ def boar_brawl(player_score, opponent_score):
     """
     # BEGIN PROBLEM 2
     "*** YOUR CODE HERE ***"
+    return max(3*abs(player_score%10 - (opponent_score//10)%10), 1)
     # END PROBLEM 2
 
 
