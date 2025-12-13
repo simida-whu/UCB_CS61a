@@ -10,7 +10,7 @@ class Transaction:
     def changed(self) -> bool:
         """Return whether the transaction resulted in a changed balance."""
         "*** YOUR CODE HERE ***"
-        return self.before == self.after
+        return self.before != self.after
 
     def report(self) -> str:
         """Return a string describing the transaction.
@@ -26,9 +26,9 @@ class Transaction:
         if self.changed():
             "*** YOUR CODE HERE ***"
             if self.before < self.after :
-                return str(self.id) + 'increased ' + self.before + '->' + self.after
+                return str(self.id) + ': increased ' + str(self.before) + '->' + str(self.after)
             else:
-                return str(self.id) + 'decreased ' + self.before + '->' + self.after
+                return str(self.id) + ': decreased ' + str(self.before) + '->' + str(self.after)
         return str(self.id) + ': ' + msg
 
 class BankAccount:
@@ -75,12 +75,15 @@ class BankAccount:
     def __init__(self, account_holder: str):
         self.balance: int = 0
         self.holder = account_holder
+        self.transactions = []
 
     def deposit(self, amount: int) -> int:
         """Increase the account balance by amount, add the deposit
         to the transaction history, and return the new balance.
         """
+        transaction = Transaction(len(self.transactions), self.balance, self.balance + amount)
         self.balance = self.balance + amount
+        self.transactions.append(transaction)
         return self.balance
 
     def withdraw(self, amount: int) -> int | str:
@@ -88,8 +91,12 @@ class BankAccount:
         to the transaction history, and return the new balance.
         """
         if amount > self.balance:
+            transaction = Transaction(len(self.transactions), self.balance, self.balance)
+            self.transactions.append(transaction)
             return 'Insufficient funds'
+        transaction = Transaction(len(self.transactions), self.balance, self.balance - amount)
         self.balance = self.balance - amount
+        self.transactions.append(transaction)
         return self.balance
 
 
@@ -146,14 +153,14 @@ class Server:
         """Append the email to the inbox of the client it is addressed to.
             email is an instance of the Email class.
         """
-        ____.inbox.append(email)
+        self.clients[email.recipient_name].inbox.append(email)
 
     def register_client(self, client):
         """Add a client to the clients mapping (which is a
         dictionary from client names to client instances).
             client is an instance of the Client class.
         """
-        ____[____] = ____
+        self.clients[client.name] = client
 
 class Client:
     """A client has a server, a name (str), and an inbox (list).
@@ -176,11 +183,11 @@ class Client:
         self.inbox: list = []
         self.server = server
         self.name = name
-        server.register_client(____)
+        server.register_client(self)
 
     def compose(self, message: str, recipient_name: str):
         """Send an email with the given message to the recipient."""
-        email = Email(message, ____, ____)
+        email = Email(message, self, recipient_name)
         self.server.send(email)
 
 
@@ -220,9 +227,11 @@ class Mint:
 
     def create(self, coin):
         "*** YOUR CODE HERE ***"
+        return coin(self.year)
 
     def update(self) -> None:
         "*** YOUR CODE HERE ***"
+        self.year = Mint.present_year
 
 class Coin:
     cents = None # will be provided by subclasses, but not by Coin itself
@@ -232,6 +241,8 @@ class Coin:
 
     def worth(self) -> int:
         "*** YOUR CODE HERE ***"
+        history = Mint.present_year - self.year
+        return (history - 50 + self.cents) if history > 50 else self.cents
 
 class Nickel(Coin):
     cents = 5
@@ -262,11 +273,13 @@ class VirFib():
     VirFib object, value 8
     """
 
-    def __init__(self, value: int = 0):
+    def __init__(self, value: int = 0, prev: int = 1):
         self.value = value
+        self.prev = prev
 
     def next(self):
         "*** YOUR CODE HERE ***"
+        return VirFib(self.value + self.prev, self.value)
 
     def __repr__(self) -> str:
         return "VirFib object, value " + str(self.value)
